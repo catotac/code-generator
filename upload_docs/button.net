@@ -1,0 +1,4 @@
+Private Sub CommandButton1_Click()
+    UploadDocument
+End Sub
+

@@ -1,0 +1,48 @@
+Sub UploadDocument()
+    Dim FilePath As String
+    Dim FileData As String
+    Dim HttpRequest As Object
+    Dim FileStream As Object
+    Dim ServerUrl As String
+
+    ' Prompt the user to select a document to upload
+    FilePath = Application.GetOpenFilename("Word Documents (*.docx), *.docx", , "Select Document to Upload")
+    
+    If FilePath = "False" Then
+        MsgBox "No document selected."
+        Exit Sub
+    End If
+    
+    ' Set the server URL where the document will be uploaded
+    ServerUrl = "https://your-server.com/upload"  ' Replace with your actual server URL
+
+    ' Create a FileSystemObject to read the file contents
+    Set FileStream = CreateObject("ADODB.Stream")
+    FileStream.Type = 1  ' Binary file
+    FileStream.Open
+    FileStream.LoadFromFile FilePath
+
+    ' Create the XMLHTTP object to send the request
+    Set HttpRequest = CreateObject("MSXML2.XMLHTTP")
+
+    ' Initialize the HTTP POST request
+    HttpRequest.Open "POST", ServerUrl, False
+    HttpRequest.setRequestHeader "Content-Type", "application/octet-stream"
+    HttpRequest.setRequestHeader "Content-Disposition", "attachment; filename=" & FilePath
+
+    ' Send the file data
+    HttpRequest.Send FileStream.Read
+
+    ' Check if the upload was successful (status code 200 indicates success)
+    If HttpRequest.Status = 200 Then
+        MsgBox "File uploaded successfully!"
+    Else
+        MsgBox "Upload failed. Status: " & HttpRequest.Status & " - " & HttpRequest.StatusText
+    End If
+
+    ' Clean up
+    FileStream.Close
+    Set FileStream = Nothing
+    Set HttpRequest = Nothing
+End Sub
+
