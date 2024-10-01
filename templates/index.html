@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Generator</title>
+    <!-- Prism.js CSS for VSCode Dark Theme -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: white;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #chat-box {
+            border: 1px solid #333;
+            padding: 20px;
+            background-color: #252526;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 120px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #333;
+            background-color: #1e1e1e;
+            color: white;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            margin-left: 10px;
+            border: none;
+            background-color: #007acc;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005f9e;
+        }
+
+        .code-block-container {
+            position: relative;
+            margin-top: 10px;
+        }
+
+        pre[class*="language-"] {
+            background-color: #1e1e1e;  /* Same as VSCode's background */
+            color: #d4d4d4;  /* Same as VSCode's font color */
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            white-space: pre-wrap;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .download-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: white;
+            font-size: 18px;
+        }
+
+        .download-btn:hover {
+            color: #ff9800;
+        }
+
+        .icon-download {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Code Generator</h1>
+    
+    <div id="chat-box">
+        <!-- Chat messages and code blocks will appear here -->
+    </div>
+
+    <input type="text" id="user-input" placeholder="Enter instruction">
+    <button id="send-btn">Send</button>
+    <button id="clear-btn">Clear Chat</button>
+
+    <!-- Prism.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/components/prism-python.min.js"></script> <!-- Add more language components if needed -->
+
+    <script>
+        // Send user input and get generated response
+        document.getElementById('send-btn').addEventListener('click', function() {
+    const userInput = document.getElementById('user-input').value;
+
+    fetch('/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ input: userInput })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const chatBox = document.getElementById('chat-box');
+
+        // Display user input
+        const userMessage = `<p><strong>You:</strong> ${userInput}</p>`;
+
+        // Display the text part of the response
+        const textResponse = `<p><strong>Response:</strong> ${data.text}</p>`;
+
+        // Render code block if present
+        let codeBlock = '';
+        if (data.code) {
+            codeBlock = `
+                <div class="code-block-container">
+                    <pre class="language-python"><code class="language-python">${escapeHtml(data.code)}</code></pre>
+                    <button class="download-btn" onclick="downloadCode('${escapeHtml(data.code)}')">
+                        <span class="icon-download">⬇</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        // Append everything to the chat box
+        chatBox.innerHTML += userMessage + textResponse + codeBlock;
+
+        // Clear the input field
+        document.getElementById('user-input').value = '';
+
+        // Re-apply Prism.js highlighting
+        Prism.highlightAll();
+    })
+    .catch(error => console.error('Error:', error));
+});
+
+        // Function to escape HTML (for proper code rendering)
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Download the generated code
+        function downloadCode(code) {
+            const blob = new Blob([code], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'generated_code.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Clear chat
+        document.getElementById('clear-btn').addEventListener('click', function() {
+            fetch('/clear', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('chat-box').innerHTML = '';  // Clear chat box
+                    alert(data.message);
+                });
+        });
+    </script>
+
+</body>
+</html>
