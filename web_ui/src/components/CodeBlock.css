@@ -1,0 +1,63 @@
+.code-block-container {
+    position: relative;
+    margin-bottom: 20px;
+    background-color: #1e1e1e;  /* Dark background for code block */
+    color: #d4d4d4;  /* Light text for code */
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Header containing the buttons, now separated into block sections */
+.code-block-header {
+    display: flex;
+    flex-direction: column;  /* Stack buttons vertically */
+    align-items: flex-end;  /* Align to the right side */
+    gap: 10px;  /* Add space between the buttons */
+    margin-bottom: 10px;
+}
+
+/* Copy button in its own block */
+.copy-button {
+    background-color: #007acc;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    width: 100px;  /* Fixed width for buttons */
+    text-align: center;  /* Center text inside button */
+    margin-bottom: 10px; /* Add some space below */
+}
+
+.copy-button:hover {
+    background-color: #005b99;
+}
+
+/* Download button in its own block */
+.download-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    width: 100px;  /* Fixed width for buttons */
+    text-align: center;  /* Center text inside button */
+}
+
+.download-button:hover {
+    background-color: #218838;
+}
+
+/* Code block styling */
+pre {
+    margin: 0;
+}
+
+code {
+    font-family: "Fira Code", "Courier New", monospace;
+    font-size: 14px;
+}
