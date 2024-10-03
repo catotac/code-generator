@@ -1,7 +1,8 @@
 from flask import send_file, session, Blueprint, jsonify
 import os
+from fastapi import APIRouter
 
-code_bp = Blueprint('code_bp', __name__)
+code_bp = APIRouter()#Blueprint('code_bp', __name__)
 
 GENERATED_CODE_DIR = 'models/generated_code'
 

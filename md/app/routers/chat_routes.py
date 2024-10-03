@@ -1,18 +1,18 @@
-from flask import Blueprint, request, jsonify
+from fastapi import APIRouter, Request
 from app.utils.code_utils import extract_code_and_text
+from fastapi.responses import JSONResponse
 
-chat_bp = Blueprint('chat_bp', __name__)
+chat_bp = APIRouter()
 
-@chat_bp.route('/api/generate', methods=['POST'])
-def generate_code():
-    data = request.json
-    user_input = data.get('input', '')
-
-    if not user_input:
-        return jsonify({'error': 'No input provided'}), 400
+@chat_bp.post('/api/generate')
+async def generate_code(request: Request):
+    try:
+        data = await request.json()
+        user_input = data.get('input', '')
+        if not user_input:
+            return JSONResponse({'error': 'No input provided'}), 400
 
     # For demonstration purposes, we return static content similar to the provided samples
-    try:
         sample_response = {
 
   'role': 'assistant',
@@ -26,7 +26,7 @@ def generate_code():
             # Extract code and text from the response
         response_parts = extract_code_and_text(model_response)
 
-        return jsonify({"response": response_parts}), 200
+        return JSONResponse(content={"response": response_parts})
     except Exception as e:
         print(f"Error: {e}")
-    return jsonify({"error": "Error generating response"}), 500
+    return JSONResponse({"error": "Error generating response"}), 500

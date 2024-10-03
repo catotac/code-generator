@@ -23,5 +23,5 @@ def extract_code_and_text(response_text):
             content_list.append({'type': 'text', 'content': match[1].strip()})
         #i += 1
 
-    print(content_list)
+    print(f"Content list: {content_list}")
     return content_list

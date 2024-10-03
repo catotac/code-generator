@@ -20,4 +20,4 @@ app.include_router(code_bp)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8080, debug=True)  # Set your custom host and port
+    uvicorn.run(app, host="0.0.0.0", port=8080)  # Set your custom host and port

@@ -15,9 +15,13 @@ function ChatBox() {
         setLoading(true);
         try {
             const response = await axios.post(`${BACKEND_URL}/api/generate`, { input });
-            setResponseParts(response.data.response);  // Expect array of text and code parts
+
+            // Ensure response.data.response is an array
+            const responseData = response.data.response || [];  // Fallback to empty array if undefined
+            setResponseParts(Array.isArray(responseData) ? responseData : []);
         } catch (error) {
             console.error('Error generating code:', error);
+            // Provide an error message in the UI
             setResponseParts([{ type: 'text', content: 'Error generating response. Please try again.' }]);
         }
         setLoading(false);
@@ -39,15 +43,19 @@ function ChatBox() {
                 </button>
 
                 <div className="response-section">
-                    {responseParts.map((part, index) => (
-                        <div key={index}>
-                            {part.type === 'text' ? (
-                                <p>{part.content}</p>
-                            ) : (
-                                <CodeBlock code={part.content} />
-                            )}
-                        </div>
-                    ))}
+                    {responseParts.length > 0 ? (
+                        responseParts.map((part, index) => (
+                            <div key={index}>
+                                {part.type === 'text' ? (
+                                    <p>{part.content}</p>
+                                ) : (
+                                    <CodeBlock code={part.content} />
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <p>No response generated yet.</p>  // Default message if no response is available
+                    )}
                 </div>
             </div>
         </div>
